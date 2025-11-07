@@ -1,8 +1,8 @@
 "use client";
 import React, { JSX, useState } from "react";
+import Ps1 from "./Prompt";
 
 type InputProps = {
-    terminalPrompt: string;
     setOutput: React.Dispatch<React.SetStateAction<(string | JSX.Element)[]>>;
     processCommand: (input: string) => void;
     getHistory: (direction: "up" | "down") => string;
@@ -46,7 +46,8 @@ const Input = (props: InputProps) => {
     };
     return (
         <div className="terminal-input-area">
-            <span className="terminal-prompt">{props.terminalPrompt}</span>
+            <Ps1/>
+            <span>{input}</span>
             <input
                 type="text"
                 className="terminal-input"

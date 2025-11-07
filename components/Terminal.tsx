@@ -4,22 +4,14 @@ import Output from "./Output";
 import Input from "./Input";
 import Message from "./Message";
 import config from "../config.json";
-
-const downloadFile = (uri: string, downloadName: string) => {
-    const link = document.createElement("a");
-    link.download = downloadName;
-    link.href = uri;
-    link.click();
-    link.remove();
-};
+import Ps1 from "./Prompt";
+import { downloadFile, email } from "@/lib/utils";
 
 type TerminalProps = {
-    terminalPrompt?: string;
     banner?: string;
-    welcomeMessage?: string;
 };
 const Terminal = (props: TerminalProps) => {
-    const { terminalPrompt = ">", banner, welcomeMessage } = props;
+    const { banner } = props;
     const [output, setOutput] = useState<(string | JSX.Element)[]>([]);
     const [history, setHistory] = useState<string[]>([]);
     const [historyIndex, setHistoryIndex] = useState(3);
@@ -35,13 +27,12 @@ const Terminal = (props: TerminalProps) => {
     const echoCommands = [
         "help",
         "about",
-        "projects",
-        "contact",
+        // "projects",
         "socials",
         "skills",
     ] as const;
     type EchoCommand = (typeof echoCommands)[number];
-    const utilityCommands = ["clear", "all", "resume"] as const;
+    const utilityCommands = ["clear", "email", "resume"] as const;
     type UtilityCommand = (typeof utilityCommands)[number];
     const allCommands = [...echoCommands, ...utilityCommands] as const;
     type Command = (typeof allCommands)[number];
@@ -58,102 +49,80 @@ const Terminal = (props: TerminalProps) => {
         return isEchoCommand(arg) || isUtilityCommand(arg);
     }
 
-    const glow = (text: string) => {
-        return <span className="terminal-glow">{text}</span>;
-    };
-
     const commands: { [key in EchoCommand]: JSX.Element } = {
         help: (
             <>
                 <ul>
                     <li>
-                        <span>about</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        about me
+                        <span>about</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; About
+                        me
+                    </li>
+                    {/* <li>
+                        <span>projects</span>&nbsp;&nbsp; Some cool stuff ive
+                        worked on
+                    </li> */}
+                    <li>
+                        <span>skills</span>&nbsp;&nbsp;&nbsp;&nbsp; Attributes
+                        ive unlocked
                     </li>
                     <li>
-                        <span>projects</span>&nbsp;&nbsp;
-                        Some cool stuff ive made
+                        <span>socials</span>&nbsp;&nbsp;&nbsp; Dont stalk me
                     </li>
                     <li>
-                        <span>skills</span>&nbsp;&nbsp;&nbsp;&nbsp;
-                        Attributes ive unlocked
+                        <span>resume</span>&nbsp;&nbsp;&nbsp;&nbsp; Check out my
+                        resume
                     </li>
                     <li>
-                        <span>socials</span>&nbsp;&nbsp;&nbsp;
-                        Dont stalk me
+                        <span>email</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Here
+                        comes the spam
                     </li>
                     <li>
-                        <span>resume</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                       Check out my resume
-                    </li>
-                    <li>
-                        <span>contact</span>&nbsp;&nbsp;&nbsp;
-                        Spam is yummy
-                    </li>
-                    <li>
-                        <span>clear</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        Clear terminal
+                        <span>clear</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Clear
+                        terminal
                     </li>
                 </ul>
-
             </>
         ),
         about: (
             <>
-                <div className="terminal-heading">Intro</div>
+                <div className="terminal-glow">Intro</div>
+                <p>Hello there! (Star Wars - iykyk) I thrive in fast-paced environments and am known for being adaptable, proactive, and collaborative. Whether I’m debugging complex issues, working alongside designers, or mentoring peers, I bring patience, curiosity, and a positive attitude to every challenge. Outside of work, I enjoy staying active through soccer and boxing, exploring new places through travel, and indulging my passion as a food connoisseur. These interests keep me energized, open-minded, and always ready for the next adventure—both in life and in my career.</p>
+
+                <div className="terminal-glow">Motivation</div>
                 <p>
-                    Hey there!
+                    I’m driven by the process — learning new technologies, optimizing code for performance, and understanding how small details can elevate the user experience. Not having a computer science degree has motivated me to demonstrate that strong technical skills and impactful product development come from dedication and continuous learning, not just formal education.
                 </p>
 
-                <div className="terminal-heading">Motivation</div>
+                <div className="terminal-glow">Experience</div>
                 <p>
-
+                    I have worked across diverse domains including gaming,
+                    blockchain, and developer tooling. I am proficient across
+                    the full stack, with primary expertise in frontend
+                    development, API integration, and scalable system design.
+                    Most recently, I contributed to the development of a digital
+                    gaming platform at Pixel Vault, where I built systems that
+                    supported over $10M in token exchanges and daily
+                    transactional volumes exceeding $250K.
+                    <br /><br />
+                    My experience spans both agile, fast-paced startup
+                    environments and structured product teams, where I’ve
+                    collaborated closely with engineers, designers, and product
+                    managers to deliver impactful user experiences. I have
+                    played a key role in modernizing codebases, implementing
+                    decentralized applications, and driving improvements in
+                    maintainability and performance. Having worked on
+                    early-stage projects, I understand how to balance technical
+                    excellence with rapid iteration to support growth and
+                    evolving business goals.
                 </p>
-
-                <div className="terminal-heading">Education</div>
-                <p>
-
-                </p>
-
-                <div className="terminal-heading">Experience</div>
-                <p>
-
-                </p>
-
-                <span>
-                    My previous formal work experience includes:
-                    <ul>
-                        <li>
-
-                        </li>
-
-
-                    </ul>
-                </span>
             </>
         ),
-        projects: (
-            <>
-            </>
-        ),
-        contact: (
-            <>
-                <ul>
-                    <li>
-                        Email{" "}
-                        <a href={`mailto:${config.social.email}`}>
-                            {config.social.email}
-                        </a>
-                    </li>
-                </ul>
-            </>
-        ),
-
+        // projects: <></>,
         socials: (
             <>
                 <ul>
                     <li>
-                       <span>GitHub</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <span>GitHub</span>&nbsp;&nbsp;&nbsp;&nbsp;
                         <a
                             target="_blank"
                             rel="noopener noreferrer"
@@ -163,7 +132,7 @@ const Terminal = (props: TerminalProps) => {
                         </a>
                     </li>
                     <li>
-                      <span>Linkedin</span>&nbsp;&nbsp;
+                        <span>Linkedin</span>&nbsp;&nbsp;
                         <a
                             target="_blank"
                             rel="noopener noreferrer"
@@ -179,13 +148,32 @@ const Terminal = (props: TerminalProps) => {
             </>
         ),
         skills: (
-            <>
-            </>
+            <ul>
+                <li>
+                    <span>Programming Languages:</span>
+                    &nbsp;&nbsp; JavaScript, TypeScript
+                </li>
+                <li>
+                    <span>Frontend:</span>&nbsp;&nbsp; React, Next.js, HTML5,
+                    CSS3
+                </li>
+                <li>
+                    <span>Backend:</span>&nbsp;&nbsp; Node.js, MongoDB, Express,
+                    GraphQL, NestJS
+                </li>
+                <li>
+                    <span>Tools & Technologies:</span>&nbsp;&nbsp; Git, WAGMI,
+                    RESTful APIs, Agile
+                </li>
+                <li>
+                    <span>Additional:</span>&nbsp;&nbsp; Microsoft Office Suite,
+                    Bilingual (English/Spanish)
+                </li>
+            </ul>
         ),
     };
 
     const processCommand = (input: string) => {
-
         // Store a record of this command with a ref to allow us to scroll it into view.
         // Note: We use a ref callback here because setting the ref directly, then clearing output seems to set the ref to null.
         const commandRecord = (
@@ -195,8 +183,7 @@ const Terminal = (props: TerminalProps) => {
                 }}
                 className="terminal-command-record"
             >
-                <span className="terminal-prompt">{terminalPrompt}</span>{" "}
-                <span>{input}</span>
+                <Ps1 /> <span className="">{input}</span>
             </div>
         );
 
@@ -213,12 +200,14 @@ const Terminal = (props: TerminalProps) => {
                 ...output,
                 commandRecord,
                 <div className="terminal-command-output">
-                    {/* <ErrorMessage command={inputCommand} /> */}
                     <div className="terminal-error-group">
                         <span className="terminal-error">
                             {`command not found: ${inputCommand}.`}
                         </span>
-                        <span>{`Type 'help' to view a list of available commands`}</span>
+                        <span>
+                            Type <span className="terminal-glow">'help'</span>{" "}
+                            to view a list of available commands
+                        </span>
                     </div>
                 </div>,
             ]);
@@ -237,11 +226,44 @@ const Terminal = (props: TerminalProps) => {
                     break;
                 }
                 case "resume": {
-                    setOutput([...output, commandRecord]);
-                    downloadFile(
-                        "resume.pdf",
-                        "Cesar Villalvir - Resume.pdf"
-                    );
+                    setOutput([
+                        ...output,
+                        commandRecord,
+                        <ul style={{ padding: "10px 10px 10px 0px" }}>
+                            <li>
+                                Downloading:
+                                <a
+                                    onClick={() =>
+                                        downloadFile(
+                                            "resume.pdf",
+                                            "Cesar Villalvir - Resume.pdf"
+                                        )
+                                    }
+                                >
+                                    Cesar Villalvir - Resume.pdf
+                                </a>
+                                ...
+                            </li>
+                        </ul>,
+                    ]);
+                    downloadFile("resume.pdf", "Cesar Villalvir - Resume.pdf");
+                    break;
+                }
+                case "email": {
+                    setOutput([
+                        ...output,
+                        commandRecord,
+                        <ul style={{ padding: "10px 10px 10px 0px" }}>
+                            <li>
+                                Opening mailto:
+                                <a href={`mailto:${config.social.email}`}>
+                                    {config.social.email}
+                                </a>
+                                ...
+                            </li>
+                        </ul>,
+                    ]);
+                    email(config.social.email);
                     break;
                 }
             }
@@ -274,8 +296,7 @@ const Terminal = (props: TerminalProps) => {
                     }}
                     className="terminal-command-record"
                 >
-                    <span className="terminal-prompt">{terminalPrompt}</span>{" "}
-                    <span>{input}</span>
+                    <Ps1 /> <span>{input}</span>
                 </div>
             );
             setOutput([
@@ -302,9 +323,11 @@ const Terminal = (props: TerminalProps) => {
             onKeyDown={focusOnInput}
         >
             <div className="terminal-content">
-                {banner && <div className="terminal-banner">{banner}</div>}
-                {welcomeMessage && (
-                    <Message message={welcomeMessage} inputRef={inputRef} />
+                {banner && output && (
+                    <>
+                        <div className="terminal-banner">{banner}</div>
+                        <Message inputRef={inputRef} />
+                    </>
                 )}
                 <Output outputs={output} />
                 <Input
@@ -313,7 +336,6 @@ const Terminal = (props: TerminalProps) => {
                     getHistory={getHistory}
                     getAutocomplete={getAutocomplete}
                     inputRef={inputRef}
-                    terminalPrompt={terminalPrompt}
                 />
             </div>
         </div>
